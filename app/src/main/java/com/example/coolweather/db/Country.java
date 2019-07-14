@@ -9,7 +9,7 @@ public class Country extends DataSupport {
 
     private String countryName;
 
-    private int cityCode;
+    private int cityId;
 
     private String weatherId;
 
@@ -29,12 +29,12 @@ public class Country extends DataSupport {
         this.countryName = countryName;
     }
 
-    public int getCityCode() {
-        return cityCode;
+    public int getCityId() {
+        return cityId;
     }
 
-    public void setCityCode(int cityCode) {
-        this.cityCode = cityCode;
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
     }
 
     public String getWeatherId() {
