@@ -2,12 +2,13 @@ package com.example.coolweather.util;
 
 import android.text.TextUtils;
 
+import com.example.coolweather.gson.HeWeather;
 import com.example.coolweather.db.City;
 import com.example.coolweather.db.Country;
 import com.example.coolweather.db.Province;
-import com.example.coolweather.gson.Weather;
-import com.google.gson.Gson;
+import com.google.gson.Gson;;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -86,19 +87,36 @@ public class Utility {
     }
 
     /**
-     * 解析返回的JSON数据为Weather实体类
+     * 用GSON解析数据
      */
-    public static Weather handleWeatherResponse(String response){
+    public static HeWeather handleWeatherResponseByGSON(String response){
         try{
             JSONObject jsonObject=new JSONObject(response);
             JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
             String weatherContent=jsonArray.getJSONObject(0).toString();
-            Gson gson=new Gson();
-            Weather weather=gson.fromJson(weatherContent,Weather.class);  /**将json数据转换成weather对象**/
-            return weather;
+            return new Gson().fromJson(weatherContent,HeWeather.class);
         }catch (Exception e){
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
+    /**
+     * 用Jackson解析接送数据
+     */
+    public static HeWeather handleWeatherResponseByJaskson(String response){
+        ObjectMapper objectMapper=JacksonMapper.getMapper();
+        try{
+            JSONObject jsonObject=new JSONObject(response);
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
+            String weatherContent=jsonArray.getJSONObject(0).toString();
+
+            HeWeather heWeather=objectMapper.readValue(weatherContent,HeWeather.class);/**解析json得到HeWeather实体类**/
+
+            return heWeather;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

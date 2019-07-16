@@ -1,35 +1,28 @@
 package com.example.coolweather.gson;
 
-import com.google.gson.annotations.SerializedName;
-
 public class Suggestion {
 
-    @SerializedName("comf")
-    public Comfort comfort;
-
-    @SerializedName("cw")
-    public CarWash carWash;
-
-    public Sport sport;
-
-    public class Comfort{
-
-        @SerializedName("txt")
-        public String info;
-
+    private Comf comf;
+    private Sport sport;
+    private Cw cw;
+    public void setComf(Comf comf) {
+        this.comf = comf;
+    }
+    public Comf getComf() {
+        return comf;
     }
 
-    public class CarWash{
-
-        @SerializedName("txt")
-        public String info;
-
+    public void setSport(Sport sport) {
+        this.sport = sport;
+    }
+    public Sport getSport() {
+        return sport;
     }
 
-    public class Sport{
-
-        @SerializedName("txt")
-        public String info;
-
+    public void setCw(Cw cw) {
+        this.cw = cw;
+    }
+    public Cw getCw() {
+        return cw;
     }
 }
