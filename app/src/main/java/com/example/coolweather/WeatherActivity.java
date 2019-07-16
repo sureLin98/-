@@ -1,21 +1,27 @@
 package com.example.coolweather;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.coolweather.gson.DailyForecast;
 import com.example.coolweather.gson.HeWeather;
 import com.example.coolweather.util.HttpUtil;
 import com.example.coolweather.util.Utility;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,9 +39,19 @@ public class WeatherActivity extends AppCompatActivity {
 
     public LinearLayout forecastLayout;
 
+    public ImageView bing_pic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(Build.VERSION.SDK_INT>=21){
+            View decorView=getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+
         setContentView(R.layout.activity_weather);
 
         /**初始化控件**/
@@ -61,6 +77,15 @@ public class WeatherActivity extends AppCompatActivity {
             String weatherId=getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
+        }
+
+        bing_pic=findViewById(R.id.bing_pic_img);
+        String picString=prefs.getString("bing_pic",null);
+        if(picString!=null){
+            //显示已缓存的图片
+            Glide.with(this).load(picString).into(bing_pic);
+        }else{
+            LoadBingPic();
         }
     }
 
@@ -135,7 +160,7 @@ public class WeatherActivity extends AppCompatActivity {
             TextView infText=view.findViewById(R.id.info_text);
             TextView maxText=view.findViewById(R.id.max_text);
             TextView minText=view.findViewById(R.id.min_text);
-            dateText.setText(new SimpleDateFormat("MM-dd").format(forecast.getDate()));
+            dateText.setText(new SimpleDateFormat("yyyy-MM-dd").format(forecast.getDate()));
             infText.setText(forecast.getCond().getTxtD());
             maxText.setText(forecast.getTmp().getMax()+"℃");
             minText.setText(forecast.getTmp().getMin()+"℃");
@@ -153,4 +178,46 @@ public class WeatherActivity extends AppCompatActivity {
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
     }
+
+    /**
+     * 加载bing图片
+     */
+    public void LoadBingPic(){
+        String address="http://guolin.tech/api/bing_pic";
+        HttpUtil.sendOkHttpRequest(address, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(WeatherActivity.this,"图片加载失败",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+
+                final String pic_string=response.body().string();
+
+                SharedPreferences.Editor editor=PreferenceManager
+                        .getDefaultSharedPreferences(WeatherActivity.this).edit();
+                editor.putString("bing_pic",pic_string);
+                editor.apply();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            Glide.with(WeatherActivity.this).load(pic_string).into(bing_pic);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            }
+        });
+    }
 }
+
