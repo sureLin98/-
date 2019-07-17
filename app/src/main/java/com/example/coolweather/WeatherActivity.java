@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -247,10 +248,12 @@ public class WeatherActivity extends AppCompatActivity {
                 String url=null;
                 final String URL;
                 final String pic_string=response.body().string();
+                Random random=new Random();
+                int i=random.nextInt(5);
                 try{
                     JSONObject jsonObject=new JSONObject(pic_string);
                     JSONArray jsonArray=jsonObject.getJSONArray("images");
-                    JSONObject jsonObject1=jsonArray.getJSONObject(1);
+                    JSONObject jsonObject1=jsonArray.getJSONObject(i);
                     url=jsonObject1.getString("url");
                 }catch (Exception e){
                     e.printStackTrace();
