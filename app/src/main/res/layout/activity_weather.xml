@@ -11,6 +11,15 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
 
+    <android.support.v4.widget.DrawerLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/drawer_layout">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ScrollView
         android:id="@+id/weather_layout"
         android:scrollbars="none"
@@ -39,5 +48,13 @@
         </LinearLayout>
 
     </ScrollView>
-
+    </android.support.v4.widget.SwipeRefreshLayout>
+        <fragment
+            android:id="@+id/choose_area_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:name="com.example.coolweather.ChooseAreaFragment"
+            />
+    </android.support.v4.widget.DrawerLayout>
 </android.support.design.widget.CoordinatorLayout>
