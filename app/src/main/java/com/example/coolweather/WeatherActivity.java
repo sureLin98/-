@@ -28,8 +28,11 @@ import com.example.coolweather.util.HttpUtil;
 import com.example.coolweather.util.Utility;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 
 import okhttp3.Call;
@@ -54,6 +57,8 @@ public class WeatherActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
 
     public Button nav_button;
+
+    String TAG="WeatherActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +122,7 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 requestWeather(mweatherId);
-
-                //LoadBingPic();
+                LoadBingPic();
             }
         });
 
@@ -224,7 +228,9 @@ public class WeatherActivity extends AppCompatActivity {
      * 加载bing图片
      */
     public void LoadBingPic(){
-        String address="http://guolin.tech/api/bing_pic";
+
+        String address="http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=5&mkt=zh-CN";
+        //http://guolin.tech/api/bing_pic;
         HttpUtil.sendOkHttpRequest(address, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -238,19 +244,30 @@ public class WeatherActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
-
+                String url=null;
+                final String URL;
                 final String pic_string=response.body().string();
+                try{
+                    JSONObject jsonObject=new JSONObject(pic_string);
+                    JSONArray jsonArray=jsonObject.getJSONArray("images");
+                    JSONObject jsonObject1=jsonArray.getJSONObject(1);
+                    url=jsonObject1.getString("url");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                URL="http://www.bing.com"+url;  //bing图片地址
 
                 SharedPreferences.Editor editor=PreferenceManager
                         .getDefaultSharedPreferences(WeatherActivity.this).edit();
-                editor.putString("bing_pic",pic_string);
+                editor.putString("bing_pic",URL);
                 editor.apply();
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try{
-                            Glide.with(WeatherActivity.this).load(pic_string).into(bing_pic);
+                            Glide.with(WeatherActivity.this).load(URL).into(bing_pic);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -260,5 +277,8 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 }
 

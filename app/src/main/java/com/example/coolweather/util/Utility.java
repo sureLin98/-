@@ -119,4 +119,19 @@ public class Utility {
         }
     }
 
+    /**
+     * 解析bing每日一图数据
+     */
+    public static String handleBingPicResponse(String reponse){
+        try{
+            JSONArray jsonArray=new JSONArray(reponse);
+            JSONObject jsonObject=jsonArray.getJSONObject(0);
+            String pic_url=jsonObject.getString("url");
+            return pic_url;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
 }
